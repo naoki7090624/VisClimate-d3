@@ -16,7 +16,7 @@ var params = {
 function main(){
   
   projection = d3.geoMercator()
-    .center([ w/2, h/2 ])
+    //.center([ w/2, h/2 ])
     .translate([w/2, h/2])
     .scale(scale);
 
@@ -25,7 +25,7 @@ function main(){
   svg = d3.select("#sampleGraph")
         .append("svg")
         .attr("width", w)
-        .attr("height", h);
+        .attr("height", h*3/4);
 
   // ColorScale = d3.scaleLinear()  // color change according to temperature
   //   .domain([-3, 0, 3])
@@ -85,15 +85,39 @@ function main(){
   n = "json/" + String(year) + ".json";
   console.log(n);
 
+  var tooltip = d3.select("body").append("div").attr("class", "tooltip");
+
 
   d3.json(n).then(function(json) {
+      console.log(json.features);
       svg.selectAll("path")  //draw the map
         .data(json.features)
         .enter()
         .append("path")
         .attr("d", path)
         .style("stroke", "gray")
-        .style("stroke-width", 0.25)
+        .on("mouseover", function(event,d) { 
+          d3.select(this).style("stroke", "black")
+          tooltip
+          .style("visibility", "visible")
+          .html("Temp : " + d3.format(".2f")(d.Temp) + "℃");
+        })
+        .on("mousemove", function(event,d) {
+          tooltip
+            .style("top", (event.pageY - 20) + "px")
+            .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", function(event,d) { 
+          d3.select(this).style("stroke", "grey")
+          d3.select(this)
+          .attr("r", function(d) {
+            return Math.sqrt(parseInt(d.Rain));
+          })
+          tooltip.style("visibility", "hidden");
+        })
+        .transition()
+        //.style("stroke", "gray")
+        //.style("stroke-width", 0.25)
         .style("fill", function(d){
           return ColorScale(parseFloat(d.Temp));
         });
@@ -110,12 +134,37 @@ function main(){
         .attr("r", function(d) {
             return Math.sqrt(parseInt(d.Rain));
         })
+        .on("mouseover", function(event,d) { 
+          d3.select(this)
+          .attr("r", function(d) {
+            return Math.sqrt(parseInt(d.Rain*2));
+          })
+          tooltip
+          .style("visibility", "visible")
+          .html("Rain : " + d3.format(".1f")(d.Rain) + "mm");
+        })
+        .on("mousemove", function(event,d) {
+          tooltip
+            .style("top", (event.pageY - 20) + "px")
+            .style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", function(d) { 
+          d3.select(this)
+          .attr("r", function(d) {
+            return Math.sqrt(parseInt(d.Rain));
+          })
+          tooltip.style("visibility", "hidden");
+        })
+        .transition()
         .style("fill", "royalblue")
-        .append("title")
+        .style("opacity", 0.7)
+        //.append("title")
   });
 }
 
 main();
+
+
 
 d3.select("#updataGraph").on("click",function(){
   year = document.getElementById("number2").value;
@@ -124,6 +173,7 @@ d3.select("#updataGraph").on("click",function(){
     svg.selectAll("path")  //draw the map
       .data(json.features)
       .attr("d", path)
+      .transition()
       .style("stroke", "gray")
       .style("stroke-width", 0.25)
       .style("fill", function(d){
@@ -140,7 +190,9 @@ d3.select("#updataGraph").on("click",function(){
       .attr("r", function(d) {
           return Math.sqrt(parseInt(d.Rain));
       })
+      .transition()
       .style("fill", "royalblue")
-      .append("title")
+      .style("opacity", 0.7)
+      //.append("title")
   });
 });
