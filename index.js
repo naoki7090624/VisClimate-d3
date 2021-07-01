@@ -3,7 +3,7 @@ var year, n, m;
 
 var w = window.innerWidth;
 var h = window.innerHeight;
-var scale = 200;
+var scale = 100;
 var svg, projection, path, ColorScale;
 
 var number;
@@ -16,7 +16,7 @@ var params = {
 function main(){
   
   projection = d3.geoMercator()
-    //.center([ w/2, h/2 ])
+    .center([ w/2, h/2 ])
     .translate([w/2, h/2])
     .scale(scale);
 
@@ -25,21 +25,17 @@ function main(){
   svg = d3.select("#sampleGraph")
         .append("svg")
         .attr("width", w)
-        .attr("height", h*3/4);
-
-  // ColorScale = d3.scaleLinear()  // color change according to temperature
-  //   .domain([-3, 0, 3])
-  //   .range(["skyblue", "white", "orange"])
-  //   .interpolate(d3.interpolateHcl);
-
+        .attr("height", h);
+  
   var data = [{"color":"#2c7bb6","value":-3},
               {"color":"#ffff8c","value":0},
               {"color":"#d7191c","value":3}];
 
   var extent = d3.extent(data, d => d.value);
   
-  var padding = 9;
-  var width = window.innerWidth/4;
+  var padding = 10;
+  var padding_top = 20;
+  var width = window.innerWidth/2;
   var innerWidth = width - (padding * 2);
   var barHeight = window.innerHeight/20;
 
@@ -54,7 +50,7 @@ function main(){
       .tickFormat(function(d) { return d + "°C"; })
       .tickValues(xTicks);
   
-  var g = svg.append("g").attr("transform", "translate(" + padding + ", 0)");
+  var g = svg.append("g").attr("transform", "translate(" + padding + ", " + padding_top + ")");
 
   var defs = svg.append("defs");
   var linearGradient = defs.append("linearGradient").attr("id", "myGradient");
@@ -83,7 +79,6 @@ function main(){
   
   year = params.Y;
   n = "json/" + String(year) + ".json";
-  console.log(n);
 
   var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 
@@ -96,18 +91,18 @@ function main(){
         .append("path")
         .attr("d", path)
         .style("stroke", "gray")
-        .on("mouseover", function(event,d) { 
+        .on("mouseover", function(d) { 
           d3.select(this).style("stroke", "black")
           tooltip
           .style("visibility", "visible")
-          .html("Temp : " + d3.format(".2f")(d.Temp) + "℃");
+          .html(d.properties.name + " - " + "Temp : " + d3.format(".2f")(d.Temp) + "℃");
         })
-        .on("mousemove", function(event,d) {
+        .on("mousemove", function(d) {
           tooltip
-            .style("top", (event.pageY - 20) + "px")
-            .style("left", (event.pageX + 10) + "px");
+            .style("top", (d3.event.pageY - 20) + "px")
+            .style("left", (d3.event.pageX + 10) + "px");
         })
-        .on("mouseout", function(event,d) { 
+        .on("mouseout", function(d) { 
           d3.select(this).style("stroke", "grey")
           d3.select(this)
           .attr("r", function(d) {
@@ -134,19 +129,19 @@ function main(){
         .attr("r", function(d) {
             return Math.sqrt(parseInt(d.Rain));
         })
-        .on("mouseover", function(event,d) { 
+        .on("mouseover", function(d) { 
           d3.select(this)
           .attr("r", function(d) {
             return Math.sqrt(parseInt(d.Rain*2));
           })
           tooltip
           .style("visibility", "visible")
-          .html("Rain : " + d3.format(".1f")(d.Rain) + "mm");
+          .html(d.properties.name + " - " + "Rain : " + d3.format(".2f")(d.Rain) + "mm");
         })
-        .on("mousemove", function(event,d) {
+        .on("mousemove", function(d) {
           tooltip
-            .style("top", (event.pageY - 20) + "px")
-            .style("left", (event.pageX + 10) + "px");
+            .style("top", (d3.event.pageY - 20) + "px")
+            .style("left", (d3.event.pageX + 10) + "px");
         })
         .on("mouseout", function(d) { 
           d3.select(this)
@@ -158,7 +153,6 @@ function main(){
         .transition()
         .style("fill", "royalblue")
         .style("opacity", 0.7)
-        //.append("title")
   });
 }
 

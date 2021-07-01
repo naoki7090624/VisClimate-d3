@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Geometric Visualization</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
 
     <!-- <script src="../D3/d3.min.js"></script> -->
     <style>
@@ -17,6 +17,7 @@
         width: 200px;
         height: 80px;
         font-size: 80px;
+        margin-left: 10px;
         display: inline-block;
       }
       button{
@@ -33,12 +34,7 @@
         font-weight: bold;
         font-style: italic;
         margin-bottom: 10px;
-      }
-      .p2{
-        font-size: 50px;
-        font-weight: bold;
-        font-style: italic;
-        margin-bottom: 10px;
+        margin-left: 10px;
       }
       .tooltip {
       position: absolute;
@@ -65,7 +61,6 @@
       <input type="number" id="number2" value="1901" min="1901" max="2020" />
       <button id="updataGraph">Update</button>
     </div>
-    <p class="p2">Color range (-3.0 ～ 3.0)</p>
     <d3 id="sampleGraph"></d3>
     <script src="./index.js" type="module"></script>
   </body>
